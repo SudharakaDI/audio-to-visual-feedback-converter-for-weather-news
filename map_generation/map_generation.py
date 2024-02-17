@@ -6,20 +6,25 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 from PIL import Image
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+import nltk.data
+from nltk.tokenize import sent_tokenize
 
 nlp = spacy.load("en_core_web_sm")
 
 #list of locations, weather conditions, times
-provinces = ["Central", "Eastern", "North-Central", "Northern","North-Western","Sabaragamuwa","Southern","Uva","Western"]
-districts = ["Ampara","Anuradhapura","Badulla","Batticaloa","Colombo","Galle","Gampaha","Hambantota","Jaffna","Kalutara","Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar","Matale","Matara","Moneragala","Mullaitivu","Nuwara Eliya","Nuwara-Eliya","Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya"]
-weather_conditions = ["shower", "flood", "cyclone", "misty", "cloudy", "sunny", "thunder", "wind"]
+provinces = ["Central", "Eastern", "East", "North-Central", "North", "Northern","North-Western","Sabaragamuwa","Southern","Uva","Western"]
+districts = ["Ampara","Anuradhapura","Badulla","Batticaloa","Colombo","Galle","Gampaha","Hambantota","Jaffna","Kalutara","Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar","Matale","Matara","Moneragala","Mullaitivu","Nuwara Eliya","Nuwara","Nuwara-Eliya","Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya"]
+weather_conditions = ["shower", "flood", "cyclone", "misty", "cloudy", "sunny", "thunder", "wind", "rainy", "rain", "foggy"]
 times = ["morning", "afternoon", "evening", "night"]
 # Define icon paths for each weather condition
 icon_paths = {
     'shower': 'weatherConditionsImages/rain.png',
+    'rainy': 'weatherConditionsImages/rain.png',
+    'rain': 'weatherConditionsImages/rain.png',
     'flood': 'weatherConditionsImages/flood.png',
     'cyclone': 'weatherConditionsImages/cyclone.webp',
     'misty': 'weatherConditionsImages/misty.png',
+    'foggy': 'weatherConditionsImages/misty.png',
     'cloudy': 'weatherConditionsImages/cloudy.png',
     'wind': 'weatherConditionsImages/cloudy.png',
     'sunny': 'weatherConditionsImages/sunny.webp',
@@ -28,14 +33,14 @@ icon_paths = {
 }
 
 #example sentences
-sentence1 = "Showers will occur at times in Eastern, north-western, Northern and Uva provinces and several spells of showers will occur in North-central province, showers or thundershowers will occur at several places in other areas of the island after 1.00 p.m, Heavy showers about 100 mm are likely at some places in Western, Sabaragamuwa and Central provinces and in Galle and Matara districts."
-sentence2 = "Misty conditions can be expected at some places in Central, Sabaragamuwa and Western provinces and showers will be occurred in Galle and Matara districts during the morning."
-sentence3 = """Several spells of showers will occur in Eastern and Uva provinces and in Polonnaruwa, Matale and Nuwara-Eliya districts.
-A few thundering may occur in Northern province and in Anuradhapura district.
-Showers or thundershowers may occur ata few places in Western and Sabaragamuwa provinces and in Galle and Matara districts after 2.00 p.m.
-Fairly strong sunny whether about (30-40) kmph can be expected at times in eastern slopes of the central hills and in Northern, North-Central, Southern,North-western, Uva and Eastern provinces.
-Misty conditions can be expected at some places in Western and Sabaragamuwa provinces and in Galle and Matara districts during the morning."""
-sentence4 = "Showers may occur in Western and Sabaragamuwa after 2.00 p.m. winds about (30-40) kmph in eastern slopes of the central hills."
+sentence1 = "There will be several rainy seasons in Eastern and Uva provinces and Polonnaruwa, Matale and Nuwara Eliya districts."
+sentence2 = "Rain or thundershowers may occur in Western and Sabaragamuwa provinces and Galle and Matara districts after around 2.00 pm."
+sentence3 = "Foggy conditions can be expected at some places in the Central, Sabaragamuwa and Western provinces, and rain will occur in the morning in Galle and Matara districts."
+sentence4 = """There will be several rainy seasons in Eastern and Uva provinces and Polonnaruwa, Matale and Nuwara Eliya districts. 
+                Light rain may occur in Northern Province and Anuradhapura district. 
+                Rain or thundershowers may occur at a few places in Western and Sabaragamuwa provinces and Galle and Matara districts after around 2.00 pm. 
+                Moderate gusty winds of around 30-40 kmph can be expected at times in Central, Uva and Eastern Provinces. 
+                Foggy conditions can be expected in Western and Sabaragamuwa provinces and Galle and Matara districts in the morning."""
 
 def extract_all_entities(sentence, districts, provinces):
     sentence = sentence.replace(',', ' ') # Remove commas from the sentence
@@ -46,15 +51,19 @@ def extract_all_entities(sentence, districts, provinces):
     while i < len(words):
         word = words[i]
         lowercase_word = word.lower()
+        #print(lowercase_word)
         doc = nlp(lowercase_word)
         lemmatized_word = doc[0].lemma_
+        #print(lemmatized_word)
         # Check if the word is a district or province
         if lowercase_word in [district.lower() for district in districts] or lowercase_word in [province.lower() for province in provinces]:
             # Check if the next word (if exists) combines with the current word to form a compound location name
             if i < len(words) - 1:
                 combined_word = f"{lowercase_word}-{words[i+1].lower()}"
-                if combined_word in [district.lower() for district in districts] or combined_word in [province.lower() for province in provinces]:
-                    entities.append(combined_word.title())
+                combined_word2 = f"{lowercase_word} {words[i+1].lower()}"
+                if combined_word in [district.lower() for district in districts] or combined_word in [province.lower() for province in provinces] or combined_word2 in [district.lower() for district in districts] or combined_word2 in [province.lower() for province in provinces]:
+                    #entities.append(combined_word.title())
+                    entities.append(combined_word.title() if "-" in combined_word else combined_word2.title())
                     i += 1
                     continue  # Skip to the next iteration
             entities.append(word.title())  # Append the original word
@@ -152,21 +161,27 @@ def display_map(dictionary):
                     # Add the city to the set of plotted cities
                     plotted_cities.add(city)
     plt.axis('off')  # Turn off axis
-    plt.show() # Show the plot
+    #plt.show() # Show the plot
+    return fig
 
 def sentence_split_from_paragraph(paragraph):
-    sentences = paragraph.splitlines()
+    #sentences = paragraph.splitlines()
+    #tokenizer = nltk.data.load('tokenizers/punkt/PY3/english.pickle')
+    sentences = sent_tokenize(paragraph)
     return sentences
 
-def main():
-    sentences = sentence_split_from_paragraph(sentence3)
+def dislpay_generated_maps(paragraph):
+    sentences = sentence_split_from_paragraph(paragraph)
     for sentence in sentences:
         print(sentence.strip()) 
         entities = extract_all_entities(sentence, districts, provinces) # Extract locations from the sentence
+        print(entities)
         dictionary = create_dictionary(entities)
         print_weather_mapping_dictionary(dictionary)
-        display_map(dictionary)
+        #display_map(dictionary)
+        fig = display_map(dictionary)
+        plt.show()
 
 if __name__ == "__main__":
-    main()
+    dislpay_generated_maps(sentence4)
 
