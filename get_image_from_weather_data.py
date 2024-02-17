@@ -17,31 +17,21 @@ weather_data = {
     }
 }
 
+def get_images(weather_data):
+    image_names = []
+    for key, value in weather_data.items():
+        for inner_key, inner_value in value.items():
+            if inner_key=="Cities":
+                for city in inner_value:
+                    image_name = key.lower() + "_" + city.lower() + ".jpg"
+                    image_names.append(image_name)
 
-image_location = "./rainy_day.jpg"
-
-response  = generate_video_id(image_location)
-
-image_id =response.json()['id']
-print(image_id)
-
-response_status = 202
-while(response_status!=200):
-    response = get_generated_video("55f2d4353820fa5e83e2f193b8ef576a795e5cdeefed3c80289463c6d3438100")
-    response_status = response.status_code
-    if response.status_code == 202:
-        print("Generation in-progress, try again in 10 seconds.")
-        time.sleep(15)
-    elif response.status_code == 200:
-        print("Generation complete!")
-        with open("video_3.mp4", 'wb') as file:
-            file.write(response.content)
-    else:
-        raise Exception(str(response.json()))
-        break
+    return image_names
 
 
 
+
+print(get_images(weather_data))
 
 
 
