@@ -6,4 +6,5 @@
 /stability-sdk
 /video*
 /venv
+/map_generation/API.json
 ```
