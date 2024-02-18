@@ -14,7 +14,7 @@ nlp = spacy.load("en_core_web_sm")
 #list of locations, weather conditions, times
 provinces = ["Central", "Eastern", "East", "North-Central", "North", "Northern","North-Western","Sabaragamuwa","Southern","Uva","Western"]
 districts = ["Ampara","Anuradhapura","Badulla","Batticaloa","Colombo","Galle","Gampaha","Hambantota","Jaffna","Kalutara","Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar","Matale","Matara","Moneragala","Mullaitivu","Nuwara Eliya","Nuwara","Nuwara-Eliya","Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya"]
-weather_conditions = ["shower", "flood", "cyclone", "misty", "mist", "cloudy", "cloud", "sunny", "thunder", "thunderstorm", "wind", "windy", "rainy", "rain", "foggy", "fog", "thundershower"]
+weather_conditions = ["shower", "flood", "cyclone", "misty", "mist", "cloudy", "cloud", "sunny", "thunder", "thunderstorm", "wind", "windy", "rainy", "rain", "foggy", "fog", "thundershower", "rough"]
 times = ["morning", "afternoon", "evening", "night"]
 
 related_conditions = {
@@ -24,7 +24,8 @@ related_conditions = {
         ("thundershower", "thunder", "thunderstorm"): "thundershower",
         ("flood"): "flood",
         ("sunny"): "sunny",
-        ("cyclone"): "cyclone"
+        ("cyclone"): "cyclone",
+        ("rough"): "rough",
         # Add other related conditions as needed
 }
 
@@ -41,7 +42,8 @@ icon_paths = {
     'wind': 'weatherConditionsImages/cloudy.png',
     'sunny': 'weatherConditionsImages/sunny.webp',
     'thunder': 'weatherConditionsImages/thunder.png',
-    'thundershower': 'weatherConditionsImages/thunder.png'
+    'thundershower': 'weatherConditionsImages/thunder.png',
+    'rough': 'weatherConditionsImages/rough.png'
 
 }
 
