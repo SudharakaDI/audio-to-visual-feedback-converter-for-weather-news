@@ -36,3 +36,5 @@ def run_video_generation_process(weather_data):
     files_in_folder = get_available_image_file_names()
     video_names = get_video_names(image_names,files_in_folder)
     generate_videos(video_names)
+
+run_video_generation_process(weather_data)

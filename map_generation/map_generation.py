@@ -1,3 +1,4 @@
+import main
 import spacy
 import re
 import requests
@@ -8,14 +9,27 @@ from PIL import Image
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import nltk.data
 from nltk.tokenize import sent_tokenize
+from text_to_video.main import run_video_generation_process
 
 nlp = spacy.load("en_core_web_sm")
 
 #list of locations, weather conditions, times
 provinces = ["Central", "Eastern", "East", "North-Central", "North", "Northern","North-Western","Sabaragamuwa","Southern","Uva","Western"]
 districts = ["Ampara","Anuradhapura","Badulla","Batticaloa","Colombo","Galle","Gampaha","Hambantota","Jaffna","Kalutara","Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar","Matale","Matara","Moneragala","Mullaitivu","Nuwara Eliya","Nuwara","Nuwara-Eliya","Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya"]
-weather_conditions = ["shower", "flood", "cyclone", "misty", "cloudy", "sunny", "thunder", "wind", "rainy", "rain", "foggy"]
+weather_conditions = ["shower", "flood", "cyclone", "misty", "mist", "cloudy", "cloud", "sunny", "thunder", "thunderstorm", "wind", "windy", "rainy", "rain", "foggy", "fog", "thundershower"]
 times = ["morning", "afternoon", "evening", "night"]
+
+related_conditions = {
+        ("foggy", "misty", "fog", "mist"): "misty",
+        ("rain", "rainy", "shower"): "rain",
+        ("cloudy", "cloud", "windy", "wind"): "wind",
+        ("thundershower", "thunder", "thunderstorm"): "thundershower",
+        ("flood"): "flood",
+        ("sunny"): "sunny",
+        ("cyclone"): "cyclone"
+        # Add other related conditions as needed
+}
+
 # Define icon paths for each weather condition
 icon_paths = {
     'shower': 'weatherConditionsImages/rain.png',
@@ -28,7 +42,8 @@ icon_paths = {
     'cloudy': 'weatherConditionsImages/cloudy.png',
     'wind': 'weatherConditionsImages/cloudy.png',
     'sunny': 'weatherConditionsImages/sunny.webp',
-    'thunder': 'weatherConditionsImages/thunder.png'
+    'thunder': 'weatherConditionsImages/thunder.png',
+    'thundershower': 'weatherConditionsImages/thunder.png'
 
 }
 
@@ -78,7 +93,7 @@ def extract_all_entities(sentence, districts, provinces):
 
     return entities
 
-def create_dictionary(entities):
+'''def create_dictionary(entities):
     city_weather_mapping = {weather: {'cities': [], 'wind_speed': [], 'rainfall': [], 'time':[] } for weather in weather_conditions}
     current_weather = None  # Variable to keep track of the current weather condition
     for entity in entities:
@@ -97,6 +112,39 @@ def create_dictionary(entities):
                 city_weather_mapping[current_weather]['time'].append(entity)
             else:
                 city_weather_mapping[current_weather]['rainfall'].append(entity)
+    return city_weather_mapping'''
+
+def create_dictionary(entities):
+    city_weather_mapping = {weather: {'cities': [], 'wind_speed': [], 'rainfall': [], 'time':[] } for weather in weather_conditions}
+    weather_events = []  # Variable to keep track of the current weather condition
+    locations = [] #variable to keep track of locations
+    time_list = []
+    wind_speeds = []
+    rainfalls = []
+    for entity in entities:
+        matching_conditions = [condition for condition in related_conditions.keys() if entity in condition]
+        if matching_conditions:
+            primary_condition = related_conditions[matching_conditions[0]]
+            weather_events.append(primary_condition)
+        #if entity in weather_conditions:  
+            #weather_events.append(entity)
+        elif entity in districts or entity in provinces:
+            locations.append(entity)
+        elif entity in times:
+            time_list.append(entity)
+        elif 'kmph' in entity:
+            wind_speeds.append(entity)
+        elif 'a.m' in entity or 'am' in entity or 'p.m' in entity or 'pm' in entity:
+            time_list.append(entity)
+        elif 'mm' in entity:
+            rainfalls.append(entity)
+    
+    for weather in weather_events:
+        city_weather_mapping[weather]['cities'] = locations
+        city_weather_mapping[weather]['time'] = time_list
+        city_weather_mapping[weather]['wind_speed'] = wind_speeds
+        city_weather_mapping[weather]['rainfall'] = rainfalls
+
     return city_weather_mapping
 
 def print_weather_mapping_dictionary(city_weather_mapping):
