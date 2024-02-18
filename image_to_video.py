@@ -1,6 +1,6 @@
 import requests
 
-image_location = "./rainy_day.jpg"
+# image_location = "./rainy_day.jpg"
 def generate_video_id(image_location):
     response = requests.post(
         f"https://api.stability.ai/v2alpha/generation/image-to-video",
@@ -14,3 +14,14 @@ def generate_video_id(image_location):
     )
     return response
 
+def get_video_names(image_names,files_in_folder):
+    video_names = []
+    for image_name in image_names:
+        if image_name in files_in_folder:
+            video_names.append(image_name.split(".")[0])
+        else:
+            video_names.append(image_name.split("_")[0]+"_"+"common")
+
+    video_names = list(set(video_names))
+    print(video_names)
+    return video_names
