@@ -8,4 +8,5 @@
 /generated_video/*
 /venv
 /map_generation/API.json
+/map_generation/generated_video/*
 ```
