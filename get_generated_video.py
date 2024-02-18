@@ -1,6 +1,6 @@
 import requests
 
-generation_id = "89b15aa4a2454c6f347e26ef835c0c4aef1510f568dbd970f568950ec149b77d"
+generation_id = "64e3f488eac15402f37eae191f93dfd74b2959d22a10fdeca1893ec72658be55"
 
 def get_generated_video(generation_id):
     response = requests.request(
