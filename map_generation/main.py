@@ -1,10 +1,9 @@
 
 import os
-from get_generated_video import get_generated_video
 
 from get_image_from_weather_data import get_images
 from generate_videos import generate_videos
-from image_to_video import generate_video_id,get_video_names
+from image_to_video import generate_video_id, get_video_names
 
 def get_available_image_file_names():
     current_directory = os.getcwd()
@@ -36,3 +35,5 @@ def run_video_generation_process(weather_data):
     files_in_folder = get_available_image_file_names()
     video_names = get_video_names(image_names,files_in_folder)
     generate_videos(video_names)
+
+# run_video_generation_process(weather_data)

@@ -4,7 +4,8 @@ import time
 
 def generate_videos(video_names):
     for video_name in video_names:
-        image_location = "./images/" + video_name + ".jpg"
+        image_location = "images/" + video_name + ".jpg"
+        print(image_location)
         response = generate_video_id(image_location)
         image_id = response.json()['id']
         print(image_id)

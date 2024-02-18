@@ -6,10 +6,8 @@ import os
 from google.cloud import translate_v2 as translate
 import map_generation
 from PIL import Image, ImageTk
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from map_generation import districts, provinces
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_agg import FigureCanvasAgg
+from main import run_video_generation_process
 import io
 import sys
 
@@ -141,6 +139,7 @@ class SpeechRecognitionApp:
                 dictionary = map_generation.create_dictionary(entities)
                 map_generation.print_weather_mapping_dictionary(dictionary)
                 fig = map_generation.display_map(dictionary)
+                run_video_generation_process(dictionary)
                 ax = fig.gca()
                 ax.text(0.5, 1, sentence, horizontalalignment='center', verticalalignment='top', transform=ax.transAxes, fontsize=10)
                 fig.set_size_inches(12, 5)

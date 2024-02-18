@@ -1,4 +1,3 @@
-import main
 import spacy
 import re
 import requests
@@ -9,7 +8,6 @@ from PIL import Image
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import nltk.data
 from nltk.tokenize import sent_tokenize
-from text_to_video.main import run_video_generation_process
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -116,6 +114,8 @@ def extract_all_entities(sentence, districts, provinces):
 
 def create_dictionary(entities):
     city_weather_mapping = {weather: {'cities': [], 'wind_speed': [], 'rainfall': [], 'time':[] } for weather in weather_conditions}
+    # city_weather_mapping = {"": {'cities': [], 'wind_speed': [], 'rainfall': [], 'time':[] }}
+    # city_weather_mapping = {}
     weather_events = []  # Variable to keep track of the current weather condition
     locations = [] #variable to keep track of locations
     time_list = []
@@ -144,6 +144,10 @@ def create_dictionary(entities):
         city_weather_mapping[weather]['time'] = time_list
         city_weather_mapping[weather]['wind_speed'] = wind_speeds
         city_weather_mapping[weather]['rainfall'] = rainfalls
+
+    #remove empty lists
+    city_weather_mapping = {k: v for k, v in city_weather_mapping.items() if any(v[key] for key in ['cities', 'wind_speed', 'rainfall', 'time'])}
+
 
     return city_weather_mapping
 

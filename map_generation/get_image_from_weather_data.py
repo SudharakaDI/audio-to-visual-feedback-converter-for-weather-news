@@ -1,9 +1,10 @@
 
 def get_images(weather_data):
+    print("get images", weather_data)
     image_names = []
     for key, value in weather_data.items():
         for inner_key, inner_value in value.items():
-            if inner_key=="Cities":
+            if inner_key=="cities":
                 for city in inner_value:
                     image_name = key.lower() + "_" + city.lower() + ".jpg"
                     image_names.append(image_name)
