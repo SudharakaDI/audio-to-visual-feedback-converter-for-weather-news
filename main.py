@@ -1,42 +1,38 @@
-import base64
+
 import os
-import requests
+from get_generated_video import get_generated_video
 
-engine_id = "stable-diffusion-v1-6"
-api_host = os.getenv('API_HOST', 'https://api.stability.ai')
-api_key = "sk-kxMvqmynYxEvqvkqvHwfUOJ5b96gtsNsYdrMcWcwscuSqRkH"
-# api_key = os.getenv("sk-kxMvqmynYxEvqvkqvHwfUOJ5b96gtsNsYdrMcWcwscuSqRkH")
+from get_image_from_weather_data import get_images
+from generate_videos import generate_videos
+from image_to_video import generate_video_id,get_video_names
 
-if api_key is None:
-    raise Exception("Missing Stability API key.")
+def get_available_image_file_names():
+    current_directory = os.getcwd()
 
-response = requests.post(
-    f"{api_host}/v1/generation/{engine_id}/text-to-image",
-    headers={
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Authorization": f"Bearer {api_key}"
+    # Create the path to the "images" directory
+    images_directory = os.path.join(current_directory, "images")
+    files_in_folder = os.listdir(images_directory)
+    print(files_in_folder)
+
+    return files_in_folder
+
+
+weather_data = {
+    "shower": {
+        "Cities": ['Eastern', 'Uva', 'Polonnaruwa', 'Matale', 'Nuwara-Eliya', 'Northern', 'Anuradhapura', 'Western', 'Sabaragamuwa', 'Galle', 'Matara'],
+        "Time": ['2.00 p.m.']
     },
-    json={
-        "text_prompts": [
-            {
-                "text": "Rainy evening near a lake"
-            }
-        ],
-        "cfg_scale": 7,
-        "height": 1024,
-        "width": 1024,
-        "samples": 1,
-        "steps": 30,
+    "misty": {
+        "Cities": ['Western', 'Sabaragamuwa', 'Galle', 'Matara'],
+        "Time": ['morning']
     },
-)
+    "wind": {
+        "Cities": ['Eastern', 'Central', 'Northern', 'North-Central', 'Southern', 'North-Western', 'Uva', 'Eastern'],
+        "Wind Speed": ['30-40 kmph']
+    }
+}
 
-if response.status_code != 200:
-    raise Exception("Non-200 response: " + str(response.text))
-
-data = response.json()
-print(data["artifacts"])
-
-for i, image in enumerate(data["artifacts"]):
-    with open(f"./out/v1_txt2img_{i}.png", "wb") as f:
-        f.write(base64.b64decode(image["base64"]))
+image_names = get_images(weather_data)
+files_in_folder = get_available_image_file_names()
+video_names = get_video_names(image_names,files_in_folder)
+generate_videos(video_names)
