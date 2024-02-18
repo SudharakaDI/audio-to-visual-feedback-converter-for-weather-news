@@ -7,6 +7,7 @@ import time
 
 
 class App:
+
     def __init__(self, window, window_title, video_sources=[]):
         self.window = window
         self.window.title(window_title)
@@ -119,8 +120,11 @@ class MyVideoCapture:
 
 
 
-video_sources = [os.path.join("generated_video", filename) for filename in os.listdir("generated_video") if filename.endswith(".mp4")]
-# Create a window and pass it to the Application object
-print(video_sources)
-App(tkinter.Tk(), "Tkinter and OpenCV",video_sources)
 
+# def start_app():
+video_sources = [os.path.join("generated_video", filename) for filename in os.listdir("generated_video") if
+                     filename.endswith(".mp4")]
+    # Create a window and pass it to the Application object
+    # print(video_sources)
+
+App(tkinter.Tk(), "Tkinter and OpenCV", video_sources)
