@@ -1,21 +1,3 @@
-import time
-from get_generated_video import get_generated_video
-from image_to_video import generate_video_id
-
-weather_data = {
-    "shower": {
-        "Cities": ['Eastern', 'Uva', 'Polonnaruwa', 'Matale', 'Nuwara-Eliya', 'Northern', 'Anuradhapura', 'Western', 'Sabaragamuwa', 'Galle', 'Matara'],
-        "Time": ['2.00 p.m.']
-    },
-    "misty": {
-        "Cities": ['Western', 'Sabaragamuwa', 'Galle', 'Matara'],
-        "Time": ['morning']
-    },
-    "wind": {
-        "Cities": ['Eastern', 'Central', 'Northern', 'North-Central', 'Southern', 'North-Western', 'Uva', 'Eastern'],
-        "Wind Speed": ['30-40 kmph']
-    }
-}
 
 def get_images(weather_data):
     image_names = []
@@ -31,7 +13,7 @@ def get_images(weather_data):
 
 
 
-print(get_images(weather_data))
+
 
 
 
