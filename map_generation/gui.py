@@ -1,5 +1,7 @@
 import tkinter as tk
 from google.cloud import speech
+from tkVideoPlayer import TkinterVideo
+
 import SpeechToText
 import threading
 import os
@@ -11,14 +13,17 @@ from main import run_video_generation_process
 import io
 import sys
 
+
+
 # Audio recording parameters
 RATE = 44100
 CHUNK = int(RATE / 10)  # 100ms
 pauseSw = False
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "API.json"
-
+video_ids = []
 class SpeechRecognitionApp:
     def __init__(self, master):
+        self.videoplayer = None
         self.master = master
         self.master.title("Speech Recognition App")
         self.master.geometry("1000x800")  # Set width and height of the window
@@ -40,15 +45,52 @@ class SpeechRecognitionApp:
         self.translate_button = tk.Button(self.master, text="Create", command=self.create, bg="lightblue", font=("Arial", 12, "bold"))
         self.translate_button.pack(pady=10)
 
+        self.play_button = tk.Button(self.master, text="Play Video", command=self.play_video, bg="lightblue",
+                                     font=("Arial", 12, "bold"))
+        self.play_button.pack(pady=10)
+
         self.image_label = tk.Label(self.master)
-        self.image_label.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+        self.image_label.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+
+        # Create left frame for the video player
+        self.video_frame = tk.Frame(self.master)
+        self.video_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # self.video_frame = tk.Label(self.master)
+        # self.video_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+        # # Create right frame for other widgets (buttons, text box, etc.)
+        # self.image_label = tk.Frame(self.master)
+        # self.image_label.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+
+        # Load and play the video (replace 'samplevideo.mp4' with your video file)
 
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)  # Bind window closing event
+
+
+
 
     def on_click(self, event):
         # Remove placeholder text when the text box is clicked
         if self.text_box.get("1.0", "end-1c") == "Start typing...":
             self.text_box.delete("1.0", "end-1c")
+
+    def play_video(self):
+        if self.videoplayer is None:  # Create video player only if not already created
+            self.videoplayer = TkinterVideo(master=self.video_frame, scaled=True)
+            if video_ids:
+                for id in video_ids:
+                    print(f'generated_video/{id}.mp4')
+                    self.videoplayer.load(f'generated_video/{id}.mp4')
+                    self.videoplayer.pack(expand=True, fill="both")
+                    self.videoplayer.play()
+            else:
+                self.videoplayer.load('generated_video/rain_uva.mp4')
+                self.videoplayer.pack(expand=True, fill="both")
+                self.videoplayer.play()
+
+        else:
+            self.videoplayer.play()
 
     def start_listening(self):
         self.start_button.config(state=tk.DISABLED)
@@ -139,10 +181,13 @@ class SpeechRecognitionApp:
                 dictionary = map_generation.create_dictionary(entities)
                 map_generation.print_weather_mapping_dictionary(dictionary)
                 fig = map_generation.display_map(dictionary)
-                run_video_generation_process(dictionary)
+                video_name = run_video_generation_process(dictionary)
+                for video in video_name:
+                    video_ids.append(video)
+                print(video_name)
                 ax = fig.gca()
                 ax.text(0.5, 1, sentence, horizontalalignment='center', verticalalignment='top', transform=ax.transAxes, fontsize=10)
-                fig.set_size_inches(12, 5)
+                fig.set_size_inches(8, 5)
                 #plt.show()
 
                 # Convert matplotlib figure to a PNG image
