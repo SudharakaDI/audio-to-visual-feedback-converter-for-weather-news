@@ -8,7 +8,8 @@ def get_generated_video(generation_id):
         f"https://api.stability.ai/v2alpha/generation/image-to-video/result/{generation_id}",
         headers={
             'Accept': "video/*",  # Use 'application/json' to receive base64 encoded JSON
-            'authorization': f"Bearer sk-kxMvqmynYxEvqvkqvHwfUOJ5b96gtsNsYdrMcWcwscuSqRkH"
+            # 'authorization': f"Bearer sk-kxMvqmynYxEvqvkqvHwfUOJ5b96gtsNsYdrMcWcwscuSqRkH"
+            'authorization': f"Bearer sk-pabvheVasARQTozy7UinUD9HzmqbGbNA7NOWe9RYtdt3SeJS"
         },
     )
 
